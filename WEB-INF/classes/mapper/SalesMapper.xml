@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.n7.erp.dao.SalesDao">
+
+   <select id="orderitem" parameterType="String" resultType="sales">
+       SELECT * FROM B_ORDER WHERE BO_CCODE = #{cCode}
+   </select>
+
+   <insert id="orderregistrationinput" parameterType="sales">
+      INSERT INTO B_ORDER VALUES(#{bo_num}||LPAD(B_ORDER_SEQ.NEXTVAL,9,0),#{bo_clcode},#{bo_ccode},#{bo_unit},#{bo_manager},#{bo_dept},#{bo_pronum},#{bo_orderdate},#{bo_duedate},#{bo_proquantity},#{bo_prosalesamount},#{bo_orderbudget})
+   </insert>
+
+   <select id="orderregistrationsearch" parameterType="String" resultType="sales">
+      SELECT * FROM B_ORDER
+      <where>
+          <if test="choice.equals('bo_num')">
+              BO_NUM = #{search} AND BO_CCODE = #{cCode}
+          </if>
+          <if test="choice.equals('bo_clcode')">
+              BO_CLCODE = #{search} AND BO_CCODE = #{cCode}
+          </if>
+          <if test="choice.equals('bo_ccode')">
+              BO_CCODE = #{search} AND BO_CCODE = #{cCode}
+          </if>
+      </where>
+   </select>
+
+   <delete id="orderregistrationdelete" parameterType="sales">
+      DELETE FROM B_ORDER WHERE BO_NUM = #{check} AND BO_CCODE = #{cCode}
+   </delete>
+
+    <insert id="shippingrequestinput" parameterType="shipping">
+      INSERT INTO B_SHIPREGIST VALUES(#{bs_docunum}||LPAD(B_SHIPREGIST_SEQ.NEXTVAL,9,0),#{bs_ccode},#{bs_bonum},#{bs_itcode},#{bs_proname},#{bs_clcode},#{bs_basedate},#{bs_unit},#{bs_quantity},#{bs_price})
+   </insert>
+
+   <select id="shippingitem" parameterType="String" resultType="shipping">
+      SELECT * FROM B_SHIPREGIST WHERE BS_CCODE = #{cCode}
+   </select>
+
+   <select id="shippingrequestsearch" parameterType="String" resultType="shipping">
+      SELECT * FROM B_SHIPREGIST
+      <where>
+          <if test="choice.equals('bs_docunum')">
+              BS_DOCUNUM = #{search} AND BS_CCODE = #{cCode}
+          </if>
+          <if test="choice.equals('bs_bonum')">
+              BS_BONUM = #{search} AND BS_CCODE = #{cCode}
+          </if>
+          <if test="choice.equals('bs_clcode')">
+              BS_CLCODE = #{search} AND BS_CCODE = #{cCode}
+          </if>
+      </where>
+   </select>
+
+    <delete id="shippingrequestdelete" parameterType="shipping">
+      DELETE FROM B_SHIPREGIST WHERE BS_DOCUNUM = #{check} AND BS_CCODE = #{cCode}
+   </delete>
+
+   <select id="approvalplan" parameterType="String" resultType="shipping">
+     SELECT * FROM B_SHIPREGIST
+   </select>
+
+   <select id="approvalplanchoice" parameterType="string" resultType="shipping">
+      SELECT * FROM B_SHIPREGIST WHERE BS_DOCUNUM = #{check} AND BS_CCODE = #{cCode}
+   </select>
+   <select id="compareCode" parameterType="string" resultType="int">
+   SELECT COUNT(*) FROM APPROVALDOCU WHERE AP_DOCUNUM=#{check} AND AP_CCODE=#{cCode}
+   </select>
+
+   <insert id="approvalinput" parameterType="appdetail">
+      INSERT INTO APPROVALDOCU VALUES(#{bs_docunum},#{bs_ccode},#{bs_docuname},#{bs_apcode1},#{bs_apcode2}, DEFAULT, 1) <!-- #{bs_date} -->
+   </insert>
+
+   <insert id="approvalinput2" parameterType="appdetail">
+      INSERT INTO B_SHIPMENT VALUES(#{bs_docunum},#{bs_ccode},#{bs_bonum},#{bs_itcode},#{bs_clcode},#{bs_docuname},#{bs_approver1},#{bs_approver2},#{bs_approver3},#{bs_basedate},#{bs_unit},#{bs_quantity},#{bs_price},DEFAULT,#{bs_proname},#{bs_credit},#{bs_apcode1},#{bs_apcode2},#{bs_apcode3},#{bs_ect})<!--#{full_payment} -->
+   </insert>
+
+   <select id="approvalLine" parameterType="String" resultType="Linee">
+   SELECT * FROM MLIST
+   </select>
+
+   <select id="searchName" parameterType="String" resultType="Linee">
+   SELECT * FROM MLIST  WHERE M_NAME=#{name}
+   </select>
+
+   <select id="addApproval" parameterType="String" resultType="Linee">
+   SELECT * FROM MLIST  WHERE HC_HRCODE=#{code}
+   </select>
+
+   <select id="approLinecom1" parameterType="String" resultType="Linee">
+   SELECT * FROM MLIST  WHERE HC_HRCODE=#{code01}
+   </select>
+
+   <select id="getMyInfo" parameterType="String" resultType="Linee">
+     SELECT * FROM MLIST WHERE HC_HRCODE=#{code}
+   </select>
+
+   <select id="creditsearch" parameterType="string" resultType="appdetail">
+      SELECT * FROM B_SHIPMENT WHERE BS_CREDIT = '외상' AND BS_CCODE=#{cCode}
+   </select>
+
+    <select id="fullpaymentsearch" parameterType="string" resultType="appdetail">
+      SELECT * FROM B_SHIPMENT WHERE BS_CREDIT = '완납' AND BS_CCODE=#{cCode}
+   </select>
+
+   <update id="fullpaymentprocess" parameterType="appdetail">
+      UPDATE B_SHIPMENT SET BS_CREDIT = '완납' WHERE BS_BONUM = #{check} AND BS_CCODE=#{cCode}
+   </update>
+
+   <insert id="uncollectedmoneyinput" parameterType="appdetail">
+      INSERT INTO B_UNCOLLECTEDMONEY VALUES(#{bs_ccode},#{bs_clcode},#{bs_itcode},#{bu_person},DEFAULT,#{bs_proname},#{bs_unit},#{bs_quantity},#{bs_price})
+   </insert>
+
+   <select id="uncollectedmoneyitem" parameterType="String" resultType="appdetail">
+       SELECT * FROM B_UNCOLLECTEDMONEY WHERE BS_CCODE=#{cCode}
+   </select>
+
+   <select id="uncollectedmoneyitem2" parameterType="String" resultType="appdetail">
+       SELECT * FROM B_SHIPMENT WHERE BS_CREDIT = '외상' AND BS_CCODE=#{cCode}
+   </select>
+
+   <select id="uncollectedmoneysearch" parameterType="String" resultType="appdetail">
+      SELECT * FROM B_UNCOLLECTEDMONEY
+      <where>
+          <if test="choice.equals('bs_clcode')">
+              BS_CLCODE = #{search} AND BS_CCODE=#{cCode}
+          </if>
+          <if test="choice.equals('bu_person')">
+              BU_PERSON = #{search} AND BS_CCODE=#{cCode}
+          </if>
+      </where>
+   </select>
+
+   <select id="businessitem" parameterType="String" resultType="business">
+       SELECT * FROM B_ACTIVITES WHERE BA_CCODE = #{cCode}
+   </select>
+
+   <insert id="businessactivitiesinput" parameterType="business">
+      INSERT INTO B_ACTIVITES VALUES(#{ba_ocode}||LPAD(B_ACTIVITES_SEQ.NEXTVAL,9,0),#{ba_ccode},#{ba_clcode},#{ba_hrcode},#{ba_unit},#{ba_startperiod},#{ba_endperiod},#{ba_date},#{ba_content},#{ba_estimatedsalesamount},#{ba_actualsalesamount},#{ba_enddate},#{ba_memo})
+   </insert>
+
+   <select id="businessactivitiessearch" parameterType="String" resultType="business">
+      SELECT * FROM B_ACTIVITES
+      <where>
+          <if test="choice.equals('ba_ocode')">
+              BA_OCODE = #{search} AND BA_CCODE= #{cCode}
+          </if>
+          <if test="choice.equals('ba_code')">
+              BA_CODE = #{search} AND BA_CCODE= #{cCode}
+          </if>
+      </where>
+   </select>
+
+   <delete id="businessactivitiesdelete" parameterType="business">
+      DELETE FROM B_ACTIVITES WHERE BA_OCODE = #{check} AND BA_CCODE = #{cCode}
+   </delete>
+
+   <select id="getbonum" parameterType="String" resultType="shipping">
+       SELECT * FROM B_SHIPREGIST WHERE BS_BONUM =#{check} AND BS_CCODE = #{cCode}
+   </select>
+
+    <!-- 수주번호 출력 -->
+   <select id="getbonumm" parameterType="String" resultType="sales">
+       SELECT * FROM B_ORDER WHERE BO_CCODE = #{cCode}
+   </select>
+
+    <!-- 결재 상세 -->
+   <insert id="approvaldetailinput" parameterType="appdetail">
+      INSERT INTO B_SHIPMENT VALUES(#{bs_docunum},#{bs_ccode},#{bs_bonum},#{bs_itcode},#{bs_clcode},#{bs_docuname},#{bs_approver1},#{bs_approver2},#{bs_approver3},#{bs_basedate},#{bs_unit},#{bs_quantity},#{bs_price},DEFAULT,#{bs_proname},#{bs_credit},#{bs_apcode1},#{bs_apcode2},#{bs_apcode3})<!--#{full_payment} -->
+   </insert>
+
+   <!-- 내가 올린 결재 상세 -->
+   	<select id="sRequest" resultType="appdetail">
+		SELECT * FROM B_SHIPMENT
+		WHERE
+		BS_DOCUNUM=#{bs_docunum} AND BS_CCODE = #{cCode}
+	</select>
+
+    <select id="getApprinfo" parameterType="String" resultType="Linee">
+		SELECT * FROM MLIST WHERE HC_HRCODE=#{code}
+	</select>
+
+    <insert id="downapprovaldetailinput" parameterType="appdetail">
+      INSERT INTO B_SHIPMENT VALUES(#{bs_docunum},#{bs_ccode},#{bs_bonum},#{bs_itcode},#{bs_clcode},#{bs_docuname},#{bs_approver1},#{bs_approver2},#{bs_approver3},#{bs_basedate},#{bs_unit},#{bs_quantity},#{bs_price},DEFAULT,#{bs_proname},#{bs_credit},#{bs_apcode1},#{bs_apcode2},#{bs_apcode3})<!--#{full_payment} -->
+    </insert>
+
+   <!-- 내가 받은 결재 상세 -->
+	<select id="sRequest2" resultType="appdetail">
+		SELECT * FROM B_SHIPMENT
+		WHERE
+		BS_DOCUNUM=#{bs_docunum} AND BS_CCODE = #{cCode}
+	</select>
+
+   <select id="getCompanyList" parameterType="String" resultType="shipping">
+      SELECT * FROM B_SHIPREGIST WHERE BS_CCODE=#{cCode} AND BS_STATUS=#{use}
+   </select>
+
+   <select id="getsearchCode" parameterType="String" resultType="sales">
+      SELECT * FROM B_ORDER WHERE BO_NUM=#{code} AND BO_CCODE=#{cCode}
+   </select>
+
+   <update id="trensCom" parameterType="String">
+      UPDATE B_SHIPREGIST SET BS_STATUS =#{use} WHERE BS_CODE=#{code} AND BS_CCODE=#{cCode}
+   </update>
+   
+   <select id="getbodept" parameterType="String" resultType="Linee">
+      SELECT HC_DEPT FROM MLIST WHERE HC_HRCODE=#{hrCode} AND HC_CCODE = #{cCode} 
+   </select> 
+
+</mapper>

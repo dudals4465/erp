@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.n7.erp.dao.PurchaseDao">
+	<!-- 구매 -->
+	<insert id="pcommom" parameterType="Purchase">
+		INSERT INTO O_PURCHASECOMMOM VALUES(#{p_documentcode}||LPAD(O_PURCHASEPROGRAM_SEQ.NEXTVAL,9,0), #{p_ccode}, #{p_productnum}, #{p_day}, #{p_clcode}, #{p_writer})
+	</insert>
+
+	<insert id="pregistration" parameterType="Purchase">
+		INSERT INTO O_PURCHASELIST VALUES(#{p_documentcode}||LPAD(O_PURCHASEPROGRAM_SEQ.CURRVAL,9,0), #{p_ccode}, #{p_itcode}, #{p_name}, #{p_unlit}, #{p_amount}, #{p_budget})
+	</insert>
+
+	<select id="pFrerence" resultType="Purchase">
+		SELECT * FROM O_PURCHASECOMMOM WHERE P_CCODE= #{cCode}
+	</select>
+
+	<select id="pfSearch" parameterType="String" resultType="Purchase">
+		SELECT * FROM O_PURCHASECOMMOM
+		<where>
+			<if test="choice.equals('p_documentcode')">
+				P_DOCUMENTCODE LIKE '%' || #{search} || '%' AND P_CCODE=#{cCode}
+			</if>
+			<if test="choice.equals('p_writer')">
+				P_WRITER LKIE '%' || #{search} || '%' AND P_CCODE=#{cCode}
+			</if>
+			<if test="choice.equals('p_day')">
+				P_DAY LIKE '%' || #{search} || '%' AND P_CCODE=#{cCode}
+			</if>
+		</where>
+	</select>
+
+	<delete id="pcDelete" parameterType="Purchase">
+		DELETE FROM O_PURCHASELIST WHERE P_DOCUMENTCODE = #{check} AND P_CCODE=#{cCode}
+	</delete>
+
+	<delete id="pfDelete" parameterType="Purchase">
+		DELETE FROM O_PURCHASECOMMOM WHERE P_DOCUMENTCODE = #{check} AND P_CCODE=#{cCode}
+	</delete>
+
+	<select id="pInfo" parameterType="String" resultType="Purchase">
+		SELECT * FROM O_PURCHASECOMMOM WHERE P_DOCUMENTCODE = #{check} AND P_CCODE=#{cCode}
+	</select>
+
+	<select id="pDetail" parameterType="String" resultType="Purchase">
+		SELECT * FROM O_PURCHASELIST WHERE P_DOCUMENTCODE = #{check} AND P_CCODE=#{cCode}
+	</select>
+
+	<select id="pBring" parameterType="String" resultType="Purchase">
+		SELECT * FROM O_PURCHASECOMMOM WHERE P_DOCUMENTCODE = #{check} AND P_CCODE=#{cCode}
+	</select>
+
+	<select id="pProgram" parameterType="String" resultType="Purchase">
+		SELECT * FROM O_PURCHASELIST WHERE P_DOCUMENTCODE= #{check} AND P_CCODE=#{cCode}
+	</select>
+
+	<!-- 결재라인 -->
+    <select id="approvalLine" parameterType="String" resultType="pALine">
+  		 SELECT * FROM MLIST
+   </select>
+
+   <select id="searchName" parameterType="String" resultType="pALine">
+   		SELECT * FROM MLIST  WHERE M_NAME=#{name}
+   </select>
+
+   <select id="addApproval" parameterType="String" resultType="pALine">
+   		SELECT * FROM MLIST  WHERE HC_HRCODE=#{code}
+   </select>
+
+   <select id="approLinecom1" parameterType="String" resultType="pALine">
+   		SELECT * FROM MLIST  WHERE HC_HRCODE=#{code01}
+   </select>
+
+	<select id="getMyInfo" parameterType="String" resultType="pALine">
+   		SELECT * FROM MLIST  WHERE HC_HRCODE=#{code}
+   </select>
+ 
+ 	<!-- 결재 -->  	
+	<insert id="Approval" parameterType="pApproval">
+		INSERT INTO APPROVALDOCU VALUES(#{p_documentcode}, #{p_ccode}, #{p_title}, #{p_apcode1}, #{p_apcode2}, DEFAULT, '1')
+	</insert>
+
+	<insert id="pApproval1" parameterType="pApproval">
+		INSERT INTO O_PURCHASEPROGRAMCOMMOM VALUES(#{p_documentcode}, #{p_ccode}, #{p_title}, #{p_day}, #{p_clcode}, DEFAULT, #{p_productnum}, #{p_etc,jdbcType=VARCHAR}, #{p_approver1}, #{p_approver2}, #{p_approver3}, #{p_apcode1}, #{p_apcode2}, #{p_apcode3}, 0)
+	</insert>
+
+	<insert id="pApproval2" parameterType="pApproval">
+		INSERT INTO O_PURCHASEPROGRAM VALUES(#{p_documentcode}, #{p_ccode}, #{p_name}, #{p_itcode}, #{p_unlit}, #{p_amount},#{p_budget})
+	</insert>
+	
+	<select id="compareCode" resultType="int" parameterType="String">
+		SELECT COUNT(*) FROM APPROVALDOCU WHERE AP_DOCUNUM = #{check} AND AP_CCODE = #{cCode}
+	</select>
+	
+	<select id="pRequest" resultType="pApproval">
+		SELECT * FROM O_PURCHASEPROGRAMCOMMOM WHERE P_DOCUMENTCODE =#{p_documentcode} AND P_CCODE= #{cCode}
+	</select>
+
+	<select id="pListRequest" resultType="pApproval">
+		SELECT * FROM O_PURCHASEPROGRAM WHERE P_DOCUMENTCODE =#{p_documentcode} AND P_CCODE= #{cCode}
+	</select>
+
+	<select id="getApprovalInfo" parameterType="String" resultType="pALine">
+		SELECT * FROM MLIST WHERE HC_HRCODE= #{code}
+	</select>
+
+	<select id="pRequest2" resultType="pApproval">
+		SELECT * FROM O_PURCHASEPROGRAMCOMMOM WHERE P_DOCUMENTCODE =#{p_documentcode} AND P_CCODE= #{cCode}
+	</select>
+
+	<select id="pListRequest2" resultType="pApproval">
+		SELECT * FROM O_PURCHASEPROGRAM WHERE P_DOCUMENTCODE =#{p_documentcode} AND P_CCODE= #{cCode}
+	</select>
+	
+	<!-- 반품 -->
+	<insert id="rRegistration" parameterType="Return">
+		INSERT INTO O_RETURN VALUES(#{r_documentcode}||LPAD(O_RETURNPROGRAM_SEQ.NEXTVAL,9,0), #{r_ccode}, #{r_ieseqnum}, #{r_itcode}, #{r_clcode}, #{r_amount}, #{r_unlit}, #{r_budget}, #{r_name}, #{r_reason}, 3, DEFAULT, #{r_writer})
+	</insert>
+
+   <insert id="insertIeport">
+      INSERT INTO S_IEPORT VALUES(S_IEPORT_SEQ.NEXTVAL, #{r_ccode}, DEFAULT, #{r_hrcode}, '' ,'3', #{r_clcode}, #{r_documentcode} ,#{r_itcode}, -#{r_amount}, #{r_unlit}, 0)
+   </insert>
+
+   <select id="getitcode" resultType="itemcode" parameterType="String">
+   	  SELECT * FROM S_ITEMCODE WHERE IT_CODE=#{it_code} AND IT_CPCODE = #{cCode}
+   </select>
+
+   <update id="updateitcode">
+       UPDATE S_ITEMCODE SET IT_STOCK = #{tot2}
+       WHERE IT_CODE = #{it_code} AND IT_CPCODE = #{cCode}
+   </update>
+
+	<select id="rInfo" resultType="Return">
+		SELECT * FROM O_RETURN WHERE R_CCODE=#{cCode}
+	</select>
+
+<!--   	<delete id="rDelete" parameterType="Return">
+		DELETE FROM O_RETURN  WHERE R_DOCUMENTCODE= #{check_list} AND R_CCODE=#{cCode}
+	</delete> -->
+
+	<select id="rSearch" resultType="Return">
+		SELECT * FROM O_RETURN
+		<where>
+			<if test="choice.equals('r_documentcode')">
+				R_DOCUMENTCODE LIKE '%' || #{search} || '%' AND R_CCODE=#{cCode}
+			</if>
+			<if test="choice.equals('r_ieseqnum')">
+				R_IESEQNUM LIKE '%' || #{search} || '%' AND R_CCODE=#{cCode}
+			</if>
+			<if test="choice.equals('r_writer')">
+				R_WRITER LIKE '%' || #{search} || '%' AND R_CCODE=#{cCode}
+			</if>
+			<if test="choice.equals('r_day')">
+				R_DAY LIKE '%' || #{search} || '%' AND R_CCODE=#{cCode}
+			</if>
+		</where>
+	</select>
+
+	<!-- 입고현황 -->
+	<select id="stocklist" parameterType="String" resultType="ieport">
+		SELECT * FROM S_IEPORT WHERE IE_CPCODE=#{cCode} AND IE_STATUS = '1'
+	</select>
+
+	<!-- 재고현황 -->
+	<select id="getstocklist" parameterType="String" resultType="itemcode">
+		SELECT * FROM S_ITEMCODE WHERE IT_CPCODE=#{cCode}
+	</select>
+	
+	<!-- 발주 -->
+	<insert id="orderInsert">
+		INSERT INTO O_ORDER VALUES(O_ORDER_SEQ.NEXTVAL, #{o_ccode}, 0, #{o_pdocucode})
+	</insert>
+	
+	<select id="orderInfo" resultType="order">
+		SELECT * FROM O_ORDER WHERE  O_CCODE = #{cCode}
+	</select>
+
+	<select id="orderSearch" resultType="order">
+		SELECT * FROM O_ORDER
+		<where>
+			<if test="choice.equals('o_ccode')">
+				O_CCODE LIKE '%' || #{search} || '%' AND O_CCODE=#{cCode}
+			</if>
+			<if test="choice.equals('o_pdocucode')">
+				O_PDOCUCODE LIKE '%' || #{search} || '%' AND O_CCODE=#{cCode}
+			</if>
+		</where>
+	</select>
+	
+	<select id="orderPinfo" resultType="approvaldocu">
+		SELECT * FROM APPROVALDOCU WHERE 
+		AP_DOCUNUM LIKE 'P%' AND AP_CCODE =#{cCode} AND AP_STATUS='3'
+	</select>
+	
+</mapper>

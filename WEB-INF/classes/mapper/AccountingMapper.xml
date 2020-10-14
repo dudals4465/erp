@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.n7.erp.dao.AccountDao">
+
+<insert id="saleinsert" parameterType="saleInfo">
+	INSERT INTO AC_SALESTATEMENT
+	VALUES(#{s_num}||LPAD(AC_REALSALESTATEMENT_SEQ.NEXTVAL,8,0),#{s_ccode},#{s_kind},#{s_comnum},DEFAULT,#{s_employee},#{s_clcode},#{s_company})
+	</insert>
+	
+<insert id="saleinsert2" parameterType="String">
+	INSERT INTO AC_SALESTATEMENTLIST
+	VALUES(#{s_num}||LPAD(AC_REALSALESTATEMENT_SEQ.CURRVAL,8,0),#{s_ccode},#{s_cnt},#{s_pkind},#{s_tax},#{s_price},#{s_price2},
+	#{s_memo},#{s_total})
+	</insert>
+
+
+	<insert id="insertcomlist" parameterType="A_com">
+	INSERT INTO AC_COMPANYLIST
+	VALUES(#{cl_code},#{cl_ccode},#{cl_name},#{cl_comnum},#{cl_comnum2},#{cl_ceo},#{cl_employee},#{cl_phone},
+	#{cl_phone2},#{cl_fax},#{cl_email},#{cl_addr},#{cl_kind},#{cl_kind2},#{cl_kind3},#{cl_bank},
+	#{cl_bankholder},#{cl_memo},#{cl_banknum},'1')
+	</insert> 
+	
+	<insert id="approvaldocu" parameterType="rs">
+	INSERT INTO APPROVALDOCU
+	VALUES(#{rs_num},#{rs_ccode},#{rs_title},#{rs_apcode0},#{rs_apcode1},DEFAULT,1)
+	</insert>
+	
+	<insert id="approdocument" parameterType="rs">
+	INSERT INTO AC_REALSALESTATEMENT
+	VALUES(#{rs_num},#{rs_ccode},#{rs_clcode},#{rs_apcode0},#{rs_apcode1},#{rs_apcode2},
+	#{rs_apname0},#{rs_apname1},#{rs_apname2},#{rs_reason},DEFAULT,#{rs_kind},#{rs_company},#{rs_comnum})
+	</insert>
+
+	<insert id="approdocument2" parameterType="rs">
+	INSERT INTO AC_REALSALESTATEMENTLIST
+	VALUES(#{rs_num},#{rs_ccode},#{rs_tax},#{rs_price},#{rs_price2},#{rs_cnt},#{rs_pkind},#{rs_total},#{rs_memo})
+	</insert>
+	
+	<select id="getcomcode" parameterType="String" resultType="A_com">
+	SELECT * FROM AC_COMPANYLIST WHERE CL_COMNUM = #{s_comnum}
+	</select>
+	
+	<select parameterType="String" id="getcomcode2" resultType="A_com">
+	SELECT * FROM AC_COMPANYLIST WHERE CL_CODE = #{s_clcode} AND CL_CCODE=#{cCode}
+	</select>
+
+	<select id="getComList" parameterType="String" resultType="A_com">
+	SELECT * FROM AC_COMPANYLIST WHERE CL_CCODE=#{cl_ccode} AND CL_STATUS='1'
+	</select>
+	
+	<select id="getcomInfo" parameterType="String" resultType="A_com">
+	SELECT * FROM AC_COMPANYLIST WHERE CL_COMNUM=#{comnum} AND CL_CCODE=#{cCode}
+	</select>
+	
+	<select id="getmyCompany" parameterType="String" resultType="myCom">
+	SELECT * FROM COMPANY WHERE C_CODE=#{cCode}
+	</select>
+	
+	<select id="getsaleList" parameterType="String" resultType="saleInfo">
+	SELECT * FROM AC_SALESTATEMENT WHERE S_CCODE=#{cCode}
+	</select>
+	
+	<select id="getsaleList2" parameterType="String" resultType="saleInfo">
+	SELECT * FROM AC_SALESTATEMENTLIST WHERE S_CCODE=#{cCode}
+	</select>
+	
+	<select id="saleDetaile" parameterType="String" resultType="saleInfo">
+	SELECT * FROM AC_SALESTATEMENT WHERE S_NUM= #{check} AND S_CCODE=#{cCode}
+	</select>
+	
+	<select id="saleDetaile2" parameterType="String" resultType="saleInfo">
+	SELECT * FROM AC_SALESTATEMENTLIST WHERE S_NUM = #{check} AND S_CCODE=#{cCode}
+	</select>
+	
+	<select id="getList" parameterType="String" resultType="saleInfo">
+	SELECT * FROM AC_SALESTATEMENT WHERE S_NUM LIKE '%'||#{code}||'%'
+	</select>
+	
+	<select id="getCompanyList" parameterType="String" resultType="A_com">
+	SELECT * FROM AC_COMPANYLIST WHERE CL_CCODE=#{cCode} AND CL_STATUS=#{use}
+	</select>
+	
+	<select id="getsearchCode" parameterType="String" resultType="A_com">
+	SELECT * FROM AC_COMPANYLIST WHERE CL_CODE=#{code} AND CL_CCODE=#{cCode} AND CL_STATUS=#{use}
+	</select>
+	
+	<select id="getTaxbill" parameterType="String" resultType="saleInfo">
+	SELECT * FROM AC_SALESTATEMENT WHERE S_NUM=#{check}
+	</select>
+
+	<select id="approvalLine" parameterType="String" resultType="Line">
+	SELECT * FROM MLIST WHERE HC_CCODE=#{cCode}
+	</select>
+
+	<select id="searchName" parameterType="String" resultType="Line">
+	SELECT * FROM MLIST  WHERE M_NAME=#{name}
+	</select>
+
+	<select id="addApproval" parameterType="String" resultType="Line">
+	SELECT * FROM MLIST  WHERE HC_HRCODE=#{code}
+	</select>
+	
+	<select id="getMyInfo" parameterType="String" resultType="Line">
+	SELECT * FROM MLIST  WHERE HC_HRCODE=#{code}
+	</select>
+
+	<select id="approLinecom1" parameterType="String" resultType="Line">
+	SELECT * FROM MLIST  WHERE HC_HRCODE=#{code01}
+	</select>
+	
+	<!-- <select id="approLinecom2" parameterType="String" resultType="Line">
+	SELECT * FROM MLIST  WHERE HC_HRCODE=#{code02}
+	</select> -->
+	<select id="getpkind" parameterType="String" resultType="saleInfo">
+	SELECT * FROM AC_SALESTATEMENTLIST WHERE S_PKIND=#{pkind}
+	</select>
+	
+	<select id="getDate" parameterType="String" resultType="saleInfo">
+	SELECT * FROM AC_SALESTATEMENT WHERE S_NUM=#{s_num}
+	</select>
+	
+	<select id="getshipment" parameterType="String" resultType="ship">
+	SELECT * FROM REQUEST WHERE CL_CCODE=#{cCode} AND IE_STATUS=#{num} AND IE_ACCODE='0'
+	</select>
+
+	<select parameterType="String" id="Ieport" resultType="ship">
+	SELECT * FROM REQUEST WHERE CL_CCODE=#{cCode} AND IE_SEQNUM=#{code} 
+	</select>
+	
+	<select id="comparecode" parameterType="String" resultType="ap">
+	SELECT * FROM APPROVALDOCU WHERE AP_DOCUNUM=#{code} AND AP_CCODE=#{cCode}
+	</select>
+	
+	<select id="comparecode2" parameterType="String" resultType="int">
+	SELECT COUNT(*) FROM APPROVALDOCU WHERE AP_DOCUNUM=#{code} AND AP_CCODE=#{cCode}
+	</select>
+	
+	<select id="selectapcode" parameterType="String" resultType="rs">
+	SELECT * FROM AC_REALSALESTATEMENT WHERE RS_NUM=#{s_num} AND RS_CCODE=#{cCode}
+	</select>
+	
+	<select id="selectSales" parameterType="String" resultType="rs">
+	SELECT * FROM AC_REALSALESTATEMENTLIST WHERE RS_NUM=#{s_num} AND RS_CCODE=#{cCode}
+	</select>
+
+
+	<select id="selectSreach" parameterType="String" resultType="saleInfo">
+	SELECT * FROM AC_SALESTATEMENT
+	<where>
+	<if test="choice.equals('num')">
+	S_NUM=#{select} AND S_CCODE=#{cCode}
+	</if>
+	<if test="choice.equals('company')">
+	S_COMPANY=#{select} AND S_CCODE=#{cCode}
+	</if>
+	<if test="choice.equals('employee')">
+	S_EMPLOYEE=#{select} AND S_CCODE=#{cCode}
+	</if>
+	</where>
+	</select>
+	<update id="statusupdate" parameterType="String">
+	UPDATE S_IEPORT SET IE_ACCODE ='1' WHERE IE_SEQNUM=#{s_code} AND IE_CPCODE=#{cCode} 
+	</update>
+	
+	<update id="trensCom" parameterType="String">
+	UPDATE AC_COMPANYLIST SET CL_STATUS =#{use} WHERE CL_CODE=#{code} AND CL_CCODE=#{cCode} 
+	</update>
+	
+	<delete id="deleteCom" parameterType="String">
+	DELETE FROM AC_COMPANYLIST WHERE CL_CODE=#{code} AND CL_CCODE=#{cCode}
+	</delete>
+	
+	<delete id="deleteSale" parameterType="String">
+	DELETE FROM AC_SALESTATEMENT WHERE S_NUM=#{code} AND S_CCODE=#{cCode}
+	</delete>
+	
+	<delete id="deleteSale2" parameterType="String">
+	DELETE FROM AC_SALESTATEMENTLIST WHERE S_NUM=#{code} AND S_CCODE=#{cCode}
+	</delete>
+
+	<delete id="saleListDelete" parameterType="String">
+	DELETE FROM AC_SALESTATEMENT WHERE S_NUM=#{ad_snum}
+	</delete>
+	
+	<!-- 여기부터 분개전표 -->
+
+
+	<!-- 페이징 위한 내가 올린 결재중 카운트 -->
+	<select id="countDocument" resultType="int">
+		SELECT COUNT(*)
+		FROM APPROVALDOCU
+		WHERE AP_CCODE = #{ap_ccode} AND AP_FROMAPPROVER = #{ap_fromapprover} AND (AP_STATUS = '1' OR AP_STATUS = '2')
+	</select>
+	
+	<!-- 페이징 위한 내가 올린 결재완료 카운트 -->
+	<select id="countDocument3" resultType="int">
+		SELECT COUNT(*)
+		FROM APPROVALDOCU
+		WHERE AP_CCODE = #{ap_ccode} AND AP_FROMAPPROVER = #{ap_fromapprover} AND AP_STATUS = '3'
+	</select>
+	
+	<!-- 페이징 위한 내가 올린 반려 카운트 -->
+	<select id="countDocument4" resultType="int">
+		SELECT COUNT(*)
+		FROM APPROVALDOCU
+		WHERE AP_CCODE = #{ap_ccode} AND AP_FROMAPPROVER = #{ap_fromapprover} AND AP_STATUS = '4'
+	</select>
+	
+	<!-- 페이징 위한 내가 받은 결재안 카운트 -->
+	<select id="countDocument1" resultType="int">
+		SELECT COUNT(*)
+		FROM APPROVALDOCU
+		WHERE AP_CCODE = #{ap_ccode} AND AP_TOAPPROVER = #{ap_toapprover} AND (AP_STATUS = '1' OR AP_STATUS = '2')
+	</select>
+	 
+	<!-- 페이징 위한 임시저장 결재안 카운트 -->
+	<select id="countDocument2" resultType="int">
+		SELECT COUNT(*)
+		FROM AC_JNOB
+		WHERE J_NONE = #{j_none} AND J_CCODE = #{j_ccode}
+	</select>
+
+	<!-- 임시저장 (결재등급0으로 INSERT) -->
+	<insert id="actempoInsert" parameterType="account">
+		INSERT INTO AC_JNOB
+		VALUES(#{j_ccode}, #{j_docunum}||LPAD(AC_JNOB_SEQ.NEXTVAL,8,0),
+		#{j_title},
+		#{j_account}, #{j_group}, #{j_debit}, #{j_credit},
+		#{j_company},
+		#{j_centre}, #{j_section}, #{j_sumup}, #{j_reasion},
+		DEFAULT,
+		#{j_none}, #{j_ntwo}, #{j_nthr}, DEFAULT)
+	</insert>
+
+	<!-- 내가 올린 결재안 결재완료 목록 -->
+	<select id="apupPaymentList3" resultType="approvaldocu">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RN, A.*
+		FROM (
+		SELECT *
+		FROM APPROVALDOCU
+		WHERE AP_FROMAPPROVER = #{hrCode} AND AP_CCODE = #{cCode} AND AP_STATUS = '3'
+		) A
+		)
+		WHERE RN BETWEEN #{start} AND #{end} 
+	</select>
+	
+	<!-- 내가 올린 결재안 반려 목록 -->
+	<select id="apupPaymentList4" resultType="approvaldocu">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RN, A.*
+		FROM (
+		SELECT *
+		FROM APPROVALDOCU
+		WHERE AP_FROMAPPROVER = #{hrCode} AND AP_CCODE = #{cCode} AND AP_STATUS = '4'
+		) A
+		)
+		WHERE RN BETWEEN #{start} AND #{end} 
+	</select>
+	
+	<!-- 내가 올린 결재안 결재중 목록 -->
+	<select id="apupPaymentList" resultType="approvaldocu">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RN, A.*
+		FROM (
+		SELECT *
+		FROM APPROVALDOCU
+		WHERE AP_FROMAPPROVER = #{hrCode} AND AP_CCODE = #{cCode} AND (AP_STATUS = '1' OR AP_STATUS = '2')
+		) A
+		)
+		WHERE RN BETWEEN #{start} AND #{end} 
+
+	</select>
+
+	<!-- 내가 받은 결재안 목록 -->
+	<select id="apdownPaymentList" resultType="approvaldocu">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RN, A.*
+		FROM (
+		SELECT *
+		FROM APPROVALDOCU
+		WHERE AP_TOAPPROVER = #{hrCode} AND AP_CCODE = #{cCode} AND (AP_STATUS = '1' OR AP_STATUS = '2')
+		) A
+		)
+		WHERE RN BETWEEN #{start} AND #{end}
+	</select>
+
+	<!-- 임시저장 결재안 목록-->
+	<select id="acTemporaryList" resultType="account">
+		SELECT *
+		FROM (
+		SELECT ROWNUM RN, A.*
+		FROM (
+		SELECT *
+		FROM AC_JNOB
+		WHERE J_NONE = #{hrCode} AND J_GRADE = '0' AND J_CCODE = #{cCode}
+		) A
+		)
+		WHERE RN BETWEEN #{start} AND #{end}
+
+	</select>
+
+	<!-- 내가올린 결재 상세 -->
+	<select id="apRequest" resultType="account">
+		SELECT *
+		FROM AC_JNOB
+		WHERE
+		J_DOCUNUM=#{j_docunum} AND J_CCODE = #{cCode}
+	</select>
+
+	<!-- 내가 받은 결재 상세 -->
+	<select id="apRequest2" resultType="account">
+		SELECT *
+		FROM AC_JNOB
+		WHERE
+		J_DOCUNUM=#{j_docunum} AND (J_GRADE !='4' AND J_GRADE != '3') AND J_CCODE = #{cCode}
+	</select>
+
+	<!-- 임시저장 결재 상세 -->
+	<select id="acRequest" resultType="account">
+		SELECT *
+		FROM AC_JNOB
+		WHERE
+		J_DOCUNUM=#{j_docunum} AND J_CCODE = #{cCode}
+	</select>
+
+	<!-- 결재자 2,3 넣어서 업데이트 -->
+	<update id="acSign" parameterType="account">
+		UPDATE AC_JNOB
+		SET J_GRADE = #{j_grade}, J_NONE =
+		#{j_none}, J_NTWO = #{j_ntwo}, J_NTHR = #{j_nthr},
+		J_REASION = #{j_reasion}, J_DATE = DEFAULT
+		WHERE J_DOCUNUM = #{j_docunum} AND J_CCODE = #{j_ccode}
+	</update>
+
+	<!-- 결재하면 등급 업데이트 -->
+	<update id="acSign2">
+		UPDATE AC_JNOB
+		SET J_GRADE = #{j_grade}
+		WHERE J_DOCUNUM
+		= #{j_docunum} AND J_CCODE = #{j_ccode}
+	</update>
+
+	<!-- 공통결재안 결재업데이트 -->
+	<update id="apSign2">
+		UPDATE APPROVALDOCU
+		SET AP_STATUS = #{ap_status},
+		AP_TOAPPROVER = #{ap_toapprover}
+		WHERE AP_DOCUNUM = #{ap_docunum} AND
+		AP_CCODE = #{ap_ccode}
+	</update>
+
+	<update id="acBack">
+		UPDATE AC_JNOB
+		SET J_GRADE = '4', J_REASION =
+		#{j_reasion}
+		WHERE J_DOCUNUM = #{j_docunum} AND J_CCODE = #{j_ccode}
+	</update>
+
+	<select id="acCheck" resultType="int">
+		SELECT COUNT(*)
+		FROM AC_JNOB
+		WHERE J_DOCUNUM = #{j_docunum} AND J_GRADE = '0' AND J_CCODE =
+		#{cCode}
+	</select>
+
+	<delete id="acDelete">
+		DELETE
+		FROM AC_JNOB
+		WHERE J_DOCUNUM = #{j_docunum} AND
+		J_CCODE = #{cCode}
+	</delete>
+
+	<!--공통결재함에 INSERT -->
+	<insert id="apCart2" parameterType="approvaldocu">
+		INSERT INTO APPROVALDOCU
+		VALUES (#{ap_docunum}, #{ap_ccode}, #{ap_docuname},
+		#{ap_fromapprover}, #{ap_toapprover}, DEFAULT, #{ap_status})
+	</insert>
+
+	<!-- 공통결재안 반려 -->
+	<update id="apBack2" parameterType="approvaldocu">
+		UPDATE APPROVALDOCU
+		SET AP_STATUS = '4'
+		WHERE AP_DOCUNUM = #{ap_docunum} AND AP_CCODE = #{ap_ccode}
+	</update>
+
+	<select id="getApprinfo" parameterType="String"
+		resultType="Line">
+		SELECT * 
+		FROM MLIST 
+		WHERE HC_HRCODE=#{code}
+	</select>
+	
+	<!-- 부서 이름 가져오기 -->
+	<select id="getAu_name" parameterType="String" resultType="Line">
+	SELECT *
+	FROM MLIST 
+	WHERE HC_HRCODE=#{hrCode} AND HC_CCODE = #{cCode} 
+	</select> 
+	
+	<select id="searchFromname" parameterType="String" resultType="String">
+	SELECT M_NAME 
+	FROM MLIST
+	WHERE HC_HRCODE = #{ap_fromapprover}
+	</select>
+	
+	<select id="searchToname" parameterType="String" resultType="String">
+	SELECT M_NAME 
+	FROM MLIST
+	WHERE HC_HRCODE = #{ap_toapprover}
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+

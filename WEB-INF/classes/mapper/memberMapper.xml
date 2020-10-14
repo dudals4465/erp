@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.n7.erp.dao.IMemberDao">
+	<select id="access" parameterType="member" resultType="boolean">
+		SELECT COUNT(*) FROM MEMBER WHERE M_ID=#{m_id} AND M_PW=#{m_pw}
+	</select>
+	<insert id="join" parameterType="member">
+		INSERT INTO MEMBER VALUES(#{m_id}, #{m_pw}, #{m_name}, #{m_address}, #{m_phonenum}, #{m_photo}, #{m_birth}, #{m_email}, DEFAULT, #{m_ccode})
+	</insert>
+	
+	<select id="getHRCard" parameterType="String" resultType="Member">
+		SELECT 
+			MEMBER.M_NAME, MEMBER.M_PHOTO, MEMBER.M_BIRTH, MEMBER.M_EMAIL, MEMBER.M_ID
+		FROM MEMBER 
+			LEFT OUTER JOIN HR_CARD
+			ON M_ID = HC_ID 
+		WHERE M_CCODE = #{cCode} AND HR_CARD.HC_WORK !='2'
+	</select>
+	
+	<update id="approvalagree" parameterType="String">
+	UPDATE APPROVALDOCU SET AP_STATUS = '2' , AP_TOAPPROVER=#{apcode} WHERE AP_DOCUNUM =#{num} AND AP_CCODE = #{cCode}
+	</update>
+	
+	<update id="approvalagree2" parameterType="String">
+    UPDATE APPROVALDOCU SET AP_STATUS = '3' WHERE AP_DOCUNUM =#{num} AND AP_CCODE = #{cCode}
+	</update>
+	
+	<update id="turnback" parameterType="String">
+	UPDATE APPROVALDOCU SET AP_STATUS = '4' WHERE AP_DOCUNUM =#{num} AND AP_CCODE = #{cCode}
+	</update>
+	
+	<update id="arbitrarily" parameterType="String">
+	UPDATE APPROVALDOCU SET AP_STATUS = '3' WHERE AP_DOCUNUM =#{num} AND AP_CCODE = #{cCode}
+	</update>
+	
+	<update id="ectupdate1" parameterType="String">
+	UPDATE AC_REALSALESTATEMENT SET RS_REASON = #{ect}  WHERE RS_NUM =#{num} AND RS_CCODE=#{cCode}
+	</update>
+	
+	<update id="ectupdate2" parameterType="String">
+	UPDATE B_SHIPMENT SET BS_ECT = #{ect}  WHERE BS_DOCUNUM =#{num} AND BS_CCODE=#{cCode}
+	</update>
+	
+	<update id="ectupdate3" parameterType="String">
+	UPDATE O_PURCHASEPROGRAMCOMMOM SET P_ETC = #{ect}  WHERE P_DOCUMENTCODE =#{num} AND P_CCODE=#{cCode}
+	</update>
+	
+	<select id="getStatus" parameterType="string" resultType="approvaldocu">
+	SELECT * FROM APPROVALDOCU WHERE AP_DOCUNUM = #{num} AND AP_CCODE =#{cCode}
+	</select>
+	
+	<select id="getAScode" parameterType="string" resultType="rs">
+	SELECT * FROM AC_REALSALESTATEMENT WHERE RS_NUM = #{num} AND RS_CCODE =#{cCode}
+	</select>
+	
+	<select id="getAPcode" parameterType="string" resultType="pApproval">
+	SELECT * FROM O_PURCHASEPROGRAMCOMMOM WHERE P_DOCUMENTCODE = #{num} AND P_CCODE =#{cCode}
+	</select>
+	
+	<select id="getAGcode" parameterType="string" resultType="appdetail">
+	SELECT * FROM B_SHIPMENT WHERE BS_DOCUNUM = #{num} AND BS_CCODE =#{cCode}
+	</select>
+	
+	<update id="salesupdate" parameterType="string">
+     UPDATE B_SHIPMENT SET BS_STATUS = '3' WHERE BS_DOCUNUM = #{num} AND BS_CCODE =#{cCode}
+   </update>
+	
+</mapper>

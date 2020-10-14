@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--회원관련 sql -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.n7.erp.dao.HRIDeptDao">
+<!-- 
+	<update id="deptpayupdate" parameterType="HashMap">
+		UPDATE HR_DEPT SET HDP_PAY=#{pay1} WHERE HDP_NUM=#{dept1}
+	</update> -->
+	<select id="payselect" parameterType="hashMap" resultType="String">
+		SELECT HDP_PAY FROM HR_DEPT WHERE HDP_NUM=#{dept} AND HDP_CCODE = #{cCode}
+	</select>
+	<select id="findDeduction" resultType="String" parameterType="hashMap">
+		SELECT HDD_AMOUNT FROM HR_DEDUCTION WHERE HDD_NAME=#{deduct} AND HDD_CCODE = #{cCode}
+	</select>
+
+	<select id = "getMyLeaderUsingGradeDept" parameterType="hashMap" resultType="namehrcode">
+		SELECT 
+			HR_CARD.HC_HRCODE, MEMBER.M_NAME, HR_CARD.HC_POSITION
+		FROM HR_CARD 
+			INNER JOIN HR_DEPT ON 
+				HR_CARD.HC_DEPT = HR_DEPT.HDP_DEPT AND 
+				HR_CARD.HC_CCODE = HR_DEPT.HDP_CCODE
+			INNER JOIN MEMBER ON
+				HR_CARD.HC_ID = MEMBER.M_ID
+		WHERE 
+			HR_DEPT.HDP_AUTH = #{authority} AND 
+			HR_CARD.HC_DEPT = #{myDept} AND
+			HR_CARD.HC_CCODE = #{cCode} AND HC_WORK != '2'
+	</select>
+	<select id="detailpay" parameterType="String"
+		resultType="HR_Card">
+		SELECT * FROM HR_CARD WHERE HC_ID=#{hc}
+	</select>
+	<select id="paysearch" parameterType="String"
+		resultType="ViewPay">
+		SELECT * FROM HR_CD_D WHERE HC_ID=#{hc}
+	</select>
+	<select id="findincentive" parameterType="String"
+		resultType="payroll">
+		SELECT HP_INCEN,HP_PAYDATE FROM HR_PAYROLL WHERE ROWNUM = 1 AND HP_HRCODE=#{hrcode}
+	</select>
+	<select id="findpay" parameterType="Viewpay" resultType="String">
+		SELECT *
+		FROM HR_PAYROLL WHERE HP_HRCODE=#{HC_HRCODE} AND
+		HP_PAYDATE=#{HP_PAYDATE}
+	</select>
+	<update id="updatepay" parameterType="Viewpay">
+		UPDATE HR_PAYROLL SET
+		HP_TAX=#{HP_TAX},HP_INCEN=#{HP_INCEN},HP_INSURANCE=#{HP_INSURANCE},HP_REALMONEY=#{HP_REALMONEY}
+		WHERE HP_PAYDATE=#{HP_PAYDATE} AND HP_HRCODE=#{HC_HRCODE}
+	</update>
+	<select id="checkingidname" parameterType="HashMap" resultType="Viewpay">
+		SELECT HR_CD_D.HC_ID, HR_CD_D.HC_DEPT, HR_CD_D.HC_POSITION, HR_CD_D.HDP_PAY, HR_CD_D.HC_CCODE, 
+			   HR_CD_D.HC_HRCODE, HR_CD_D.HDP_AUTH, HR_CD_D.HDD_AMOUNT, HR_CD_D.M_NAME, HR_CD_D.HC_HOLYNUM 
+		FROM HR_CD_D INNER JOIN HR_CARD ON HR_CD_D.HC_ID = HR_CARD.HC_ID
+		WHERE 
+			   (HR_CD_D.HC_ID LIKE '%'||#{checkpayid}||'%' AND HR_CD_D.HC_CCODE=#{cCode} 
+			OR HR_CD_D.M_NAME LIKE '%'||#{checkpayid}||'%' AND HR_CD_D.HC_CCODE=#{cCode}
+			OR HR_CD_D.HC_ID LIKE '%'||#{checkpayid}||'%' AND HR_CD_D.M_NAME LIKE '%'||#{checkpayid}||'%' AND HR_CD_D.HC_CCODE=#{cCode})
+			AND HR_CARD.HC_WORK != '2'
+		ORDER BY HC_DEPT DESC
+	</select>
+</mapper>

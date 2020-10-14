@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.n7.erp.dao.IConsultingBoardDao">
+   <select id="getBoardList" parameterType="int" resultType="board">
+      <![CDATA[
+         SELECT  *FROM (
+            SELECT /*+INDEX_DESC(CONSULTING_BOARD CB_NUM_PK)*/ ROWNUM RN, CONSULTING_BOARD.*
+            FROM CONSULTING_BOARD
+            WHERE ROWNUM<=#{pageNum}*10)
+         WHERE RN>=#{pageNum}*10-9
+      ]]>
+   </select>
+
+    <insert id="boardWrite" parameterType="board">
+         INSERT INTO CONSULTING_BOARD (CB_NUM,CB_TYPE,CB_WRITER,CB_PASSWORD,CB_TITLE,CB_CONTENTS)
+        VALUES(BR_NUM_SEQ.NEXTVAL, #{cb_type}, #{cb_writer}, #{cb_password}, #{cb_title}, #{cb_contents})
+   </insert>
+
+   <select id="getContents" parameterType="int" resultType="board">
+            SELECT * FROM CONSULTING_BOARD WHERE CB_NUM = #{cb_num}
+   </select>
+
+   <select id="boardSearch" resultType="board">
+         SELECT * FROM CONSULTING_BOARD
+         <where>
+            <if test="choice.equals('CB_TITLE')">
+                CB_TITLE LIKE '%'|| #{keyword} ||'%'
+            </if>
+            <if test="choice.equals('CB_WRITER')">
+                CB_WRITER LIKE '%'|| #{keyword} ||'%'
+            </if>
+         </where>
+   </select>
+
+   <update id="insertReply" parameterType="string">
+   UPDATE CONSULTING_BOARD SET CB_REPLY = #{reply} WHERE CB_NUM=#{num}
+   </update>
+
+   <delete id="delectBoard" parameterType="string">
+   DELETE FROM CONSULTING_BOARD WHERE CB_NUM = #{num} AND CB_PASSWORD=#{password}
+   </delete>
+<!--    <insert id="writeBoard" parameterType="board">
+      INSERT INTO CONSULTING_BOARD
+      VALUES(BR_NUM_SEQ.NEXTVAL,#{CB_TYPE},#{CB_WRITER},#{CB_PASSWORD},#{CB_TITLE},#{CB_CONTENTS})
+   </insert>
+
+   <select id="boardmodifyajax" parameterType="Integer" resultType="board">
+      SELECT * FROM CONSULTING_BOARD WHERE CB_NUM=#{CB_NUM}
+   </select>
+   <update id="boardmodify" parameterType="board">
+      UPDATE CONSULTING_BOARD SET CB_TYPE=#{CB_TYPE},CB_TITLE=#{CB_TITLE},CB_CONTENTS=#{CB_CONTENTS} WHERE CB_NUM=#{CB_NUM}
+   </update>
+   <delete id="writelistdelete" parameterType="Integer">
+      DELETE FROM CONSULTING_BOARD WHERE CB_NUM=#{CB_NUM}
+   </delete>  -->
+</mapper>

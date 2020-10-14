@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.n7.erp.dao.IHrDao">
+
+<select id="selectHrCard" resultType="member">
+	SELECT *
+		FROM (
+			 SELECT ROWNUM RN, A.*
+				FROM (
+					  SELECT
+					  		MEMBER.M_ID, MEMBER.M_NAME, MEMBER.M_BIRTH, MEMBER.M_EMAIL, MEMBER.M_PHOTO
+					  FROM MEMBER
+					  		LEFT OUTER JOIN HR_CARD ON M_ID = HC_ID
+					  WHERE 
+					  		M_CCODE = #{cCode} AND HR_CARD.HC_WORK != '2'
+					  ORDER BY HC_DEPT DESC
+					  ) A
+			 ) 
+		WHERE 
+			RN BETWEEN #{start} AND #{end}
+</select>
+
+<select id="countHrCard" resultType="int">
+	SELECT COUNT(*) FROM MEMBER WHERE M_CCODE = #{cCode}
+</select>
+
+<select id="selectNoHrCard" resultType="member">
+	SELECT *
+		FROM (
+			 SELECT ROWNUM RN, A.*
+				FROM (
+					  SELECT
+					  		MEMBER.M_ID, MEMBER.M_NAME, MEMBER.M_BIRTH, MEMBER.M_EMAIL, MEMBER.M_PHOTO
+					  FROM MEMBER
+					  		LEFT OUTER JOIN HR_CARD ON M_ID = HC_ID
+					  WHERE
+					  		M_CCODE = #{cCode} AND HR_CARD.HC_HRCODE IS NULL
+                      ORDER BY HC_DEPT DESC
+					  ) A
+			 ) 
+		WHERE 
+			RN BETWEEN #{start} AND #{end}
+</select>
+
+<select id="countNoHrCard" resultType="int">		
+	SELECT COUNT(*)
+	FROM MEMBER 
+		LEFT OUTER JOIN HR_CARD ON M_ID = HC_ID 
+	WHERE 
+		M_CCODE = #{cCode} AND HR_CARD.HC_HRCODE IS NULL
+</select>
+
+
+<select id="selectEmployeeStatus" resultType="HR_Card">
+	SELECT *
+		FROM (
+			 SELECT ROWNUM RN, A.*
+				FROM (
+					  SELECT 
+					  		MEMBER.M_NAME, HR_CARD.HC_DEPT, HR_CARD.HC_POSITION, HR_CARD.HC_STATUS
+					  FROM HR_CARD
+					  		INNER JOIN MEMBER ON HC_ID = M_ID
+					  WHERE 
+					  		HC_CCODE = #{cCode} AND HC_STATUS = #{argument} AND HC_WORK != '2'
+					  ORDER BY HC_DEPT DESC
+					  ) A
+			 ) 
+		WHERE 
+			RN BETWEEN #{start} AND #{end}
+</select>
+
+<select id="countEmployeeStatus" resultType="int">
+	SELECT COUNT(*) FROM HR_CARD WHERE HC_CCODE = #{cCode} AND HC_STATUS = #{status} AND HC_WORK != '2'
+</select>
+
+
+<select id="selectWages" resultType="viewpay">
+	SELECT *
+		FROM (
+			 SELECT ROWNUM RN, A.*
+				FROM (
+					  SELECT 
+					  		HR_CD_D.HC_ID, HR_CD_D.HC_DEPT, HR_CD_D.HC_POSITION, HR_CD_D.HDP_PAY, HR_CD_D.HC_CCODE, 
+					  		HR_CD_D.HC_HRCODE, HR_CD_D.HDP_AUTH, HR_CD_D.HDD_AMOUNT, HR_CD_D.M_NAME, HR_CD_D.HC_HOLYNUM
+					  FROM HR_CD_D INNER JOIN HR_CARD ON HR_CD_D.HC_HRCODE = HR_CARD.HC_HRCODE
+					  WHERE 
+					  		HR_CD_D.HC_CCODE = #{cCode} AND HR_CARD.HC_WORK !='2'
+					  ORDER BY HC_DEPT DESC
+					  ) A
+			 ) 
+		WHERE 
+			RN BETWEEN #{start} AND #{end}
+</select>
+
+<select id="countWages" resultType="int">
+	SELECT COUNT(*) 
+	FROM HR_CD_D INNER JOIN HR_CARD ON HR_CD_D.HC_ID = HR_CARD.HC_ID 
+	WHERE HR_CD_D.HC_CCODE = #{cCode} AND HR_CARD.HC_WORK!='2'
+</select>
+
+
+
+<update parameterType="HR_Card" id="updateHRCard">
+	UPDATE HR_CARD
+	SET
+		HC_JOINDATE = #{hc_joindate},
+		HC_DEPT = #{hc_dept},
+		HC_POSITION = #{hc_position},
+		HC_HOLYNUM = #{hc_holynum}
+	WHERE
+		HC_ID = #{hc_id} AND HC_CCODE = #{hc_ccode}
+</update>
+
+<update parameterType="Academic" id="updateAcademic">
+	UPDATE HR_ACADEMIC
+	SET
+		HAC_SCHOOL = #{hac_school},
+		HAC_MAJOR = #{hac_major},
+		HAC_YEAR = #{hac_year}
+	WHERE HAC_HRCODE = #{hac_hrcode} AND HAC_NUM = ${hac_num} AND HAC_CCODE = #{hac_ccode}
+</update>
+
+<insert parameterType="Academic" id="registAcademic">
+	INSERT INTO HR_ACADEMIC (HAC_NUM, HAC_CCODE, HAC_HRCODe, HAC_SCHOOL, HAC_MAJOR, HAC_YEAR)
+	VALUES
+		(HR_ACADEMIC_SEQ.nextval, #{hac_ccode}, #{hac_hrcode}, #{hac_school}, #{hac_major}, #{hac_year})
+</insert>
+
+<update parameterType="Career" id="updateCareer">
+	UPDATE HR_CAREER
+	SET
+		HCR_NAME = #{hcr_name},
+		HCR_STARTPERIOD = #{hcr_startperiod},
+		HCR_ENDPERIOD = #{hcr_endperiod},
+		HCR_CONTENT = #{hcr_content},
+		HCR_POSITION = #{hcr_position}
+	WHERE HCR_HRCODE = #{hcr_hrcode} AND HCR_NUM = ${hcr_num} AND HCR_CCODE = #{hcr_ccode}
+</update>
+
+<insert parameterType="Career" id="registCareer">
+	INSERT INTO HR_CAREER
+	VALUES
+		(HR_CAREER_SEQ.nextval, #{hcr_ccode}, #{hcr_hrcode}, #{hcr_name}, #{hcr_startperiod},
+		#{hcr_endperiod}, #{hcr_position}, #{hcr_content})
+</insert>
+
+<update parameterType="Certification" id="updateCertification">
+	UPDATE HR_CERTIFICATION
+	SET
+		HCT_NAME = #{hct_name},
+		HCT_AGENCY = #{hct_agency},
+		HCT_DATE = #{hct_date}
+	WHERE HCT_HRCODE = #{hct_hrcode} AND HCT_NUM = ${hct_num} AND HCT_CCODE = #{hct_ccode}
+</update>
+
+<insert parameterType="Certification" id="registCertification">
+	INSERT INTO HR_CERTIFICATION
+	VALUES
+		(HR_CERTIFICATION_SEQ.nextval, #{hct_ccode}, #{hct_hrcode}, #{hct_name}, #{hct_agency}, #{hct_date})
+</insert>
+
+
+<select id="getEmployeeAttendance" parameterType="hashMap" resultType="Attendance">
+	SELECT
+		HR_ATTENDANCE.HA_TIME, HR_ATTENDANCE.HA_TYPE, MEMBER.M_NAME, HR_ATTENDANCE.HA_HRCODE
+	FROM HR_ATTENDANCE
+		INNER JOIN HR_CARD ON
+			HR_ATTENDANCE.HA_HRCODE = HR_CARD.HC_HRCODE AND
+			HR_ATTENDANCE.HA_CCODE = HR_CARD.HC_CCODE
+		INNER JOIN MEMBER ON
+			HR_CARD.HC_ID = MEMBER.M_ID
+	WHERE
+		HR_ATTENDANCE.HA_CCODE = #{cCode} AND
+		HR_ATTENDANCE.HA_TIME LIKE #{dateStandard}
+	ORDER BY HA_TIME
+</select>
+
+<select id="getEmployeeHoliday" parameterType="String" resultType="NameHoliday">
+	SELECT
+		HR_APPLYHOLIDAY.HAP_TYPE, HR_APPLYHOLIDAY.HAP_STARTDAY, HR_APPLYHOLIDAY.HAP_ENDDAY, HR_APPLYHOLIDAY.HAP_STATUS, MEMBER.M_NAME, HR_APPLYHOLIDAY.HAP_DOCUNUM
+	FROM HR_APPLYHOLIDAY
+		INNER JOIN HR_CARD ON
+			HR_APPLYHOLIDAY.HAP_HRCODE = HR_CARD.HC_HRCODE AND
+			HR_APPLYHOLIDAY.HAP_CCODE = HR_CARD.HC_CCODE
+		INNER JOIN MEMBER ON
+			HR_CARD.HC_ID = MEMBER.M_ID
+	WHERE
+		HR_APPLYHOLIDAY.HAP_CCODE = #{cCode} AND
+		(HR_APPLYHOLIDAY.HAP_STARTDAY LIKE #{date} OR HR_APPLYHOLIDAY.HAP_ENDDAY LIKE #{date})
+	ORDER BY HAP_STARTDAY
+</select>
+
+
+<select id="getMyHolidayView" parameterType="String" resultType="NameHoliday">
+	SELECT
+		HR_APPLYHOLIDAY.HAP_TYPE, HR_APPLYHOLIDAY.HAP_STARTDAY, HR_APPLYHOLIDAY.HAP_ENDDAY, HR_APPLYHOLIDAY.HAP_STATUS, MEMBER.M_NAME, HR_APPLYHOLIDAY.HAP_HRCODE, HR_APPLYHOLIDAY.HAP_DOCUNUM
+	FROM HR_APPLYHOLIDAY
+		INNER JOIN HR_CARD ON
+			HR_APPLYHOLIDAY.HAP_HRCODE = HR_CARD.HC_HRCODE AND
+			HR_APPLYHOLIDAY.HAP_CCODE = HR_CARD.HC_CCODE
+		INNER JOIN MEMBER ON
+			HR_CARD.HC_ID = MEMBER.M_ID
+	WHERE
+		HR_APPLYHOLIDAY.HAP_CCODE = #{cCode} AND HR_APPLYHOLIDAY.HAP_HRCODe = #{hrCode} AND
+		(HR_APPLYHOLIDAY.HAP_STARTDAY LIKE #{date} OR HR_APPLYHOLIDAY.HAP_ENDDAY LIKE #{date}) AND HR_APPLYHOLIDAY.HAP_STATUS=1 OR
+		HR_APPLYHOLIDAY.HAP_CCODE = #{cCode} AND HR_APPLYHOLIDAY.HAP_HRCODe = #{hrCode} AND
+		(HR_APPLYHOLIDAY.HAP_STARTDAY LIKE #{date} OR HR_APPLYHOLIDAY.HAP_ENDDAY LIKE #{date}) AND HR_APPLYHOLIDAY.HAP_STATUS=3 
+	ORDER BY HAP_STARTDAY
+</select>
+
+<select id="checkMemberHrCardCnt" parameterType="String" resultType="boolean">
+	SELECT
+		COUNT(*)
+	FROM MEMBER
+		LEFT OUTER JOIN HR_CARD ON
+			M_ID = HC_ID
+	WHERE
+		M_CCODE = #{cCode} AND HR_CARD.HC_HRCODE IS NULL
+</select>
+
+<select id="getHrCodeFromStatus" parameterType="hashMap" resultType="hr_card">
+	SELECT
+		HR_CARD.HC_DEPT, HR_CARD.HC_POSITION, HR_CARD.HC_HRCODE, MEMBER.M_NAME, HR_CARD.HC_STATUS
+	FROM HR_CARD
+		INNER JOIN MEMBER ON
+			MEMBER.M_ID = HR_CARD.HC_ID
+	WHERE
+		HC_CCODE = #{cCode} AND HC_STATUS = #{status}
+</select>
+
+<update id="updateLeftHoliday" parameterType="hashMap">
+	UPDATE
+		HR_CARD
+	SET
+		HC_HOLYNUM = (SELECT HC_HOLYNUM
+						FROM HR_CARD
+						WHERE HC_HRCODE = #{hrCode}
+					 )-${term}
+	WHERE
+		HC_HRCODE = #{hrCode}
+</update>
+</mapper>

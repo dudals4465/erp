@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.n7.erp.dao.menuDao">
+<select id="getmenu" parameterType="String" resultType="Menu">
+SELECT * FROM MENU
+</select>
+
+<select id="getaddmenu" parameterType="String" resultType="fmenu">
+SELECT * FROM ERP_FUNCTION WHERE F_CCODE=#{cCode} ORDER BY F_FUNCTIONS
+</select>
+
+<select id="getCompanyInfo" parameterType="String" resultType="company">
+SELECT * FROM COMPANY WHERE C_CODE=#{cCode}
+</select>
+
+<insert id="addmenu" parameterType="String">
+INSERT INTO ERP_FUNCTION VALUES(#{cCode},#{menu}) 
+</insert>
+
+<update id="companyUpdate" parameterType="String">
+UPDATE COMPANY SET C_NAME=#{c_name}, C_CEO=#{c_ceo}, C_PHONENUM=#{c_phonenum}, C_KIND=#{c_kind}, C_KIND2=#{c_kind2}, C_ADDR=#{c_addr}, C_COMNUM=#{c_comnum} WHERE C_CODE=#{c_code}
+</update>
+
+<delete id="deletemenu" parameterType="String">
+DELETE FROM ERP_FUNCTION WHERE F_CCODE=#{cCode}
+</delete>
+
+
+<insert id="authInsert" parameterType="authority">
+INSERT INTO AUTHORITY VALUES(#{au_comname}, #{au_name}, #{au_authority})
+</insert>
+
+<select id="authoritList" parameterType="authority" resultType="authority">
+SELECT * 
+FROM AUTHORITY
+WHERE AU_COMNAME = #{cCode}
+</select>
+
+<delete id="depratmentDelete" parameterType="String">
+DELETE 
+FROM AUTHORITY 
+WHERE AU_COMNAME = #{cCode} AND AU_NAME = #{au_name}
+</delete>
+
+
+<select id="namecheck" resultType="int">
+SELECT COUNT(*) 
+FROM AUTHORITY 
+WHERE AU_NAME LIKE '%'||#{au_name}||'%'  AND AU_COMNAME = #{au_comname}
+</select>
+
+</mapper>
